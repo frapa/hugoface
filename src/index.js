@@ -12,6 +12,7 @@ import { isLoggedIn } from "./services/login";
 import Login from "./components/Login/Login";
 import Admin from "./components/Admin/Admin";
 import { Articles } from "./components/Articles/Articles";
+import Editor from "./components/Editor/Editor";
 
 function PrivateRoute({ children, ...attributes }) {
   return isLoggedIn() ? (
@@ -35,6 +36,11 @@ ReactDOM.render(
         <PrivateRoute path="/articles">
           <Admin>
             <Articles />
+          </Admin>
+        </PrivateRoute>
+        <PrivateRoute path="/article/:filename">
+          <Admin>
+            <Editor />
           </Admin>
         </PrivateRoute>
         <PrivateRoute path="/pages">
