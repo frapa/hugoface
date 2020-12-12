@@ -1,0 +1,34 @@
+html,
+body,
+#root,
+.app {
+  margin: 0;
+  height: 100%;
+}
+
+.app {
+  display: flex;
+}
+
+.sidebar {
+  width: 16rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  padding: 1rem;
+}
+
+.menu {
+  flex-grow: 1;
+  padding: 1rem;
+}
+
+.user {
+  padding: 1rem;
+}
+
+.page {
+  flex-grow: 1;
+}
