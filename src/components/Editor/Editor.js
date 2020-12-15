@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import fromMarkdown from "mdast-util-from-markdown";
 
 import "./Editor.css";
-import { getArticle } from "../../services/articles";
+import { getArticle, saveArticle } from "../../services/articles";
 
 function escapeHtml(unsafe) {
   return unsafe
@@ -14,39 +14,91 @@ function escapeHtml(unsafe) {
     .replace(/'/g, "&#039;");
 }
 
+function unescapeHtml(unsafe) {
+  return unsafe
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'");
+}
+
+function formatParagraph(paragraph, parent) {
+  const ending = parent.type === "root" ? "<br /><br />" : "";
+
+  const content = toMarkdown(paragraph);
+  const trimmedContent = toMarkdown(paragraph).trim();
+
+  // TODO: add support for {{% %}} shortcodes and split shortcodes
+  if (
+    trimmedContent.slice(0, 6) === "{{&lt;" &&
+    trimmedContent.slice(-6) === "&gt;}}"
+  ) {
+    // const shortcode = trimmedContent.split(" ", 2)[1];
+    return `<span class="has-text-grey-light">${content}</span>${ending}`;
+  } else {
+    return `${content}${ending}`;
+  }
+}
+
 function toMarkdown(tree) {
   let markdown = "";
+
+  let i = 0;
   for (const child of tree.children) {
-    if (child.type == "heading") {
+    // HEADING
+    if (child.type === "heading") {
       const prefix = "#".repeat(child.depth);
       const title = toMarkdown(child);
-      markdown += `<div class="title is-${
-        child.depth + 2
-      }">${prefix} ${title}</div><br />\n`;
-    } else if (child.type == "text") {
-      markdown += escapeHtml(child.value);
-    } else if (child.type == "paragraph") {
-      markdown += toMarkdown(child);
+      markdown += `<strong class="">${prefix} ${title}</strong><br /><br />`;
+      // TEXT
+    } else if (child.type === "text") {
+      markdown += escapeHtml(child.value)
+        .replace(/\r/g, "")
+        .replace(/\n/g, "<br />");
+      // PARAGRAPH
+    } else if (child.type === "paragraph") {
+      markdown += formatParagraph(child, tree);
+      // LINK
+    } else if (child.type === "link") {
+      const content = toMarkdown(child);
+      markdown +=
+        `<a href="#">` +
+        `<span class="has-text-grey-light">[</span>` +
+        content +
+        `<span class="has-text-grey-light">](${child.url})</span>` +
+        `</a>`;
+      // LIST
+    } else if (child.type === "list") {
+      markdown += toMarkdown(child) + "<br />";
+      // LIST ITEM
+    } else if (child.type === "listItem") {
+      const content = toMarkdown(child);
+      markdown += `<strong>-</strong> ${content}<br />`;
+      // WARN
+    } else {
+      console.warn(`Unsupported child type: ${child.type}`);
     }
+
+    i++;
   }
+
   return markdown;
+}
+
+function fromEditorHtml(editorHtml) {
+  return unescapeHtml(
+    editorHtml
+      .replace(/<br>|<br \/>/g, "\n")
+      .replace(/<\/div>/g, "\n")
+      .replace(/<.+?>/g, "")
+  );
 }
 
 function toEditorHtml(tree) {
   console.log(tree);
-
   const markdown = toMarkdown(tree);
   return markdown;
-
-  // let editorHtml = escapeHtml(markdown);
-
-  // editorHtml = editorHtml.replace(/\r/g, "").replace(/\n/g, "<br />\n");
-  // editorHtml = editorHtml.replace(
-  //   /^(#+.*)$/gm,
-  //   '<div class="title is-4">$1</div>'
-  // );
-
-  // return editorHtml;
 }
 
 export default function Editor() {
@@ -58,28 +110,61 @@ export default function Editor() {
   useEffect(() => {
     (async () => {
       const article = await getArticle(filename);
+      console.log(article.body);
       setArticle(article);
-      if (article.body) {
-        setTree(fromMarkdown(article.body));
-      }
+      setTree(fromMarkdown(article.body));
     })();
-  }, []);
+  }, [filename]);
+
+  function setBody(editorHtml) {
+    if (!article) return;
+
+    const markdown = fromEditorHtml(editorHtml);
+    const newArticle = { ...article, body: markdown };
+
+    setArticle(newArticle);
+    saveArticle(newArticle);
+  }
 
   if (!article) return <div></div>;
 
+  const editorContent = tree ? toEditorHtml(tree) : "";
+
+  console.log((article.body || "").trimStart().split("\n").length);
+
   return (
-    <div>
-      <h1 className="title is-4">{article.title}</h1>
-      <div>{article.slug}</div>
-      <div>
-        <div
-          dangerouslySetInnerHTML={{
-            __html: tree ? toEditorHtml(tree) : "",
-          }}
-          contentEditable={true}
-          // TODO: other events such as paste, keyup and blur
-          onInput={(event) => console.log(event.target.innerHTML)}
-        ></div>
+    <div className="is-flex is-justify-content-center">
+      <div className="article-data">
+        <h1 className="title">{article.title}</h1>
+        {/* <div>{article.slug}</div> */}
+        <div className="editor-container">
+          <div
+            className="gutter has-text-grey-lighter has-text-right"
+            dangerouslySetInnerHTML={{
+              __html: (article.body || "")
+                .trimStart()
+                .split("\n")
+                .slice(0, -1)
+                .map((line, i) => {
+                  const extraLines = Math.floor(line.length / 72);
+                  const postfix =
+                    extraLines > 0 ? "<br />".repeat(extraLines) : "";
+                  return `${i + 1}${postfix}`;
+                })
+                .join("<br />"),
+            }}
+          ></div>
+          <div
+            className="editor"
+            dangerouslySetInnerHTML={{
+              __html: editorContent,
+            }}
+            contentEditable={true}
+            // TODO: other events such as paste, keyup and blur
+            // TODO: debounce
+            onInput={(event) => setBody(event.target.innerHTML)}
+          ></div>
+        </div>
       </div>
     </div>
   );

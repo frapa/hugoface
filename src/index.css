@@ -1,5 +1,11 @@
 @import "bulma/css/bulma.css";
 
+@import "~fontsource-roboto/400.css";
+
+body {
+  font-family: "Roboto";
+}
+
 .pointer {
-    cursor: pointer;
+  cursor: pointer;
 }

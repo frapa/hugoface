@@ -15,20 +15,26 @@ export default function Admin({ children }) {
   return (
     <div className="app">
       <nav className="sidebar has-background-light">
-        <div className="logo">
+        <div className="logo has-text-centered">
           <img src={logo} alt="Hugoface" />
         </div>
 
         <div className="menu">
-          <div>
-            <Link to="/dashboard">Dashboard</Link>
-          </div>
-          <div>
-            <Link to="/articles">Articles</Link>
-          </div>
-          <div>
-            <Link to="/pages">Pages</Link>
-          </div>
+          <Link to="/dashboard">
+            <div className="menu-item">
+              <span>Dashboard</span>
+            </div>
+          </Link>
+          <Link to="/articles">
+            <div className="menu-item">
+              <span>Articles</span>
+            </div>
+          </Link>
+          <Link to="/pages">
+            <div className="menu-item">
+              <span>Pages</span>
+            </div>
+          </Link>
         </div>
 
         <div className="user">
@@ -38,8 +44,24 @@ export default function Admin({ children }) {
         </div>
       </nav>
 
-      <div className="page section">
-        <main className="container">{children}</main>
+      <div className="page">
+        <div className="search-bar has-text-centered">
+          <p className="control has-icons-left">
+            <input
+              className="input"
+              id="search"
+              type="text"
+              placeholder="Go to..."
+            />
+            <span className="icon is-small is-left">
+              <i className="fas fa-search"></i>
+            </span>
+          </p>
+        </div>
+
+        <div className="section">
+          <main className="container">{children}</main>
+        </div>
       </div>
     </div>
   );

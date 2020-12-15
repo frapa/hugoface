@@ -1,0 +1,21 @@
+@import "~fontsource-source-code-pro/400.css";
+
+.article-data {
+}
+
+.editor-container {
+  display: flex;
+  font-family: "Source Code Pro";
+  max-width: 78ch;
+  margin: 3rem 0;
+}
+
+.gutter {
+  width: 8ch;
+  margin-right: 3ch;
+}
+
+.editor {
+  flex-grow: 1;
+  overflow-x: auto;
+}
