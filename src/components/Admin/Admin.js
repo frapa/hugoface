@@ -44,22 +44,34 @@ export default function Admin({ children }) {
         </div>
       </nav>
 
-      <div className="page">
-        <div className="search-bar has-text-centered">
-          <p className="control has-icons-left">
-            <input
-              className="input"
-              id="search"
-              type="text"
-              placeholder="Go to..."
-            />
-            <span className="icon is-small is-left">
-              <i className="fas fa-search"></i>
-            </span>
-          </p>
+      <div className="main">
+        <div className="search-bar">
+          <div className="columns">
+            <div className="column"></div>
+
+            <div className="column is-half">
+              <p className="control has-icons-left">
+                <input
+                  className="input"
+                  id="search"
+                  type="text"
+                  placeholder="Go to..."
+                />
+                <span className="icon is-small is-left">
+                  <i className="fas fa-search"></i>
+                </span>
+              </p>
+            </div>
+
+            <div className="column has-text-right">
+              <button className="button is-primary" disabled>
+                Publish
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div className="section">
+        <div className="page section">
           <main className="container">{children}</main>
         </div>
       </div>

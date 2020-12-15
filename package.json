@@ -9,6 +9,7 @@
     "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^12.5.0",
     "bulma": "^0.9.1",
+    "firebase": "^8.2.0",
     "fontsource-roboto": "^3.1.5",
     "fontsource-source-code-pro": "^3.1.5",
     "install": "^0.13.0",
@@ -47,5 +48,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "firebase-tools": "^8.20.0"
   }
 }

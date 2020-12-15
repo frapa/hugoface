@@ -116,14 +116,20 @@ export default function Editor() {
     })();
   }, [filename]);
 
+  function setAndSaveArticle(article) {
+    if (!article) return;
+
+    setArticle(article);
+    saveArticle(article);
+  }
+
   function setBody(editorHtml) {
     if (!article) return;
 
     const markdown = fromEditorHtml(editorHtml);
     const newArticle = { ...article, body: markdown };
 
-    setArticle(newArticle);
-    saveArticle(newArticle);
+    setAndSaveArticle(newArticle);
   }
 
   if (!article) return <div></div>;
@@ -135,7 +141,14 @@ export default function Editor() {
   return (
     <div className="is-flex is-justify-content-center">
       <div className="article-data">
-        <h1 className="title">{article.title}</h1>
+        <input
+          className="input title"
+          type="text"
+          value={article.title}
+          onChange={(event) =>
+            setAndSaveArticle({ ...article, title: event.target.value })
+          }
+        />
         {/* <div>{article.slug}</div> */}
         <div className="editor-container">
           <div

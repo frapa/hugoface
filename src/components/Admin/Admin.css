@@ -50,9 +50,10 @@ body,
   padding: 1rem;
 }
 
-.page {
-  overflow-y: auto;
+.main {
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .search-bar {
@@ -62,4 +63,9 @@ body,
 }
 
 #search {
+}
+
+.page {
+  flex-grow: 1;
+  overflow-y: auto;
 }
