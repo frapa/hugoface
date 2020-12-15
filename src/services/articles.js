@@ -73,6 +73,10 @@ export async function getArticle(filename) {
 }
 
 export async function saveArticle(article) {
+  if (article.hasOwnProperty("date")) {
+    article.date = article.date.toISOString();
+  }
+
   const filename = article.filename;
 
   if (!filename) {

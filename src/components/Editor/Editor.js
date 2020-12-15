@@ -101,6 +101,19 @@ function toEditorHtml(tree) {
   return markdown;
 }
 
+function lineNumbersHtml(articleBody) {
+  return (articleBody || "")
+    .trimStart()
+    .split("\n")
+    .slice(0, -1)
+    .map((line, i) => {
+      const extraLines = Math.floor(line.length / 72);
+      const postfix = extraLines > 0 ? "<br />".repeat(extraLines) : "";
+      return `${i + 1}${postfix}`;
+    })
+    .join("<br />");
+}
+
 export default function Editor() {
   const { filename } = useParams();
 
@@ -110,7 +123,6 @@ export default function Editor() {
   useEffect(() => {
     (async () => {
       const article = await getArticle(filename);
-      console.log(article.body);
       setArticle(article);
       setTree(fromMarkdown(article.body));
     })();
@@ -136,8 +148,6 @@ export default function Editor() {
 
   const editorContent = tree ? toEditorHtml(tree) : "";
 
-  console.log((article.body || "").trimStart().split("\n").length);
-
   return (
     <div className="is-flex is-justify-content-center">
       <div className="article-data">
@@ -149,22 +159,68 @@ export default function Editor() {
             setAndSaveArticle({ ...article, title: event.target.value })
           }
         />
+
+        {/* <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Published</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control is-expanded has-icons-left">
+                <span class="icon is-small is-left">
+                  <i class="fas fa-calendar-alt"></i>
+                </span>
+                <input
+                  className="input"
+                  type="date"
+                  value={
+                    article.date && article.date.toISOString().split("T")[0]
+                  }
+                  onChange={(event) =>
+                    setAndSaveArticle({
+                      ...article,
+                      date: new Date(event.target.value),
+                    })
+                  }
+                />
+              </div>
+            </div>
+          </div>
+        </div> */}
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Slug</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control is-expanded has-icons-left">
+                <span class="icon is-small is-left">
+                  <i class="fas fa-link"></i>
+                </span>
+                <input
+                  className="input"
+                  type="text"
+                  value={article.slug}
+                  onChange={(event) =>
+                    setAndSaveArticle({
+                      ...article,
+                      datsluge: event.target.value,
+                    })
+                  }
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* <div>{article.slug}</div> */}
+
         <div className="editor-container">
           <div
             className="gutter has-text-grey-lighter has-text-right"
             dangerouslySetInnerHTML={{
-              __html: (article.body || "")
-                .trimStart()
-                .split("\n")
-                .slice(0, -1)
-                .map((line, i) => {
-                  const extraLines = Math.floor(line.length / 72);
-                  const postfix =
-                    extraLines > 0 ? "<br />".repeat(extraLines) : "";
-                  return `${i + 1}${postfix}`;
-                })
-                .join("<br />"),
+              __html: lineNumbersHtml(article.body),
             }}
           ></div>
           <div
