@@ -101,17 +101,24 @@ function toEditorHtml(tree) {
   return markdown;
 }
 
-function lineNumbersHtml(articleBody) {
-  return (articleBody || "")
-    .trimStart()
-    .split("\n")
-    .slice(0, -1)
-    .map((line, i) => {
-      const extraLines = Math.floor(line.length / 72);
-      const postfix = extraLines > 0 ? "<br />".repeat(extraLines) : "";
-      return `${i + 1}${postfix}`;
-    })
-    .join("<br />");
+// function lineNumbersHtml(articleBody) {
+//   return (articleBody || "")
+//     .trimStart()
+//     .split("\n")
+//     .slice(0, -1)
+//     .map((line, i) => {
+//       const extraLines = Math.floor(line.length / 72);
+//       const postfix = extraLines > 0 ? "<br />".repeat(extraLines) : "";
+//       return `${i + 1}${postfix}`;
+//     })
+//     .join("<br />");
+// }
+
+function slugify(title) {
+  return title
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]/g, "");
 }
 
 export default function Editor() {
@@ -144,6 +151,11 @@ export default function Editor() {
     setAndSaveArticle(newArticle);
   }
 
+  function setTitle(title) {
+    const slug = slugify(title);
+    setAndSaveArticle({ ...article, title, slug });
+  }
+
   if (!article) return <div></div>;
 
   const editorContent = tree ? toEditorHtml(tree) : "";
@@ -155,9 +167,7 @@ export default function Editor() {
           className="input title"
           type="text"
           value={article.title}
-          onChange={(event) =>
-            setAndSaveArticle({ ...article, title: event.target.value })
-          }
+          onChange={(event) => setTitle(event.target.value)}
         />
 
         {/* <div class="field is-horizontal">
@@ -188,20 +198,20 @@ export default function Editor() {
           </div>
         </div> */}
 
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Slug</label>
+        <div className="field is-horizontal">
+          <div className="field-label is-normal">
+            <label className="label">Slug</label>
           </div>
-          <div class="field-body">
-            <div class="field">
-              <div class="control is-expanded has-icons-left">
-                <span class="icon is-small is-left">
-                  <i class="fas fa-link"></i>
+          <div className="field-body">
+            <div className="field">
+              <div className="control is-expanded has-icons-left">
+                <span className="icon is-small is-left">
+                  <i className="fas fa-link"></i>
                 </span>
                 <input
                   className="input"
                   type="text"
-                  value={article.slug}
+                  value={article.slug || ""}
                   onChange={(event) =>
                     setAndSaveArticle({
                       ...article,
@@ -217,12 +227,12 @@ export default function Editor() {
         {/* <div>{article.slug}</div> */}
 
         <div className="editor-container">
-          <div
+          {/* <div
             className="gutter has-text-grey-lighter has-text-right"
             dangerouslySetInnerHTML={{
               __html: lineNumbersHtml(article.body),
             }}
-          ></div>
+          ></div> */}
           <div
             className="editor"
             dangerouslySetInnerHTML={{

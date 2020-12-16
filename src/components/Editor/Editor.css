@@ -4,16 +4,20 @@
 .editor-container {
   display: flex;
   font-family: "Source Code Pro";
-  max-width: 78ch;
-  margin: 3rem 0;
+  /* width: 78ch; */
+  width: 70ch;
+  margin: 1.5rem 0;
+  padding: 1.5rem 0;
+  border-top: 2px solid hsl(0, 0%, 96%);
 }
 
-.gutter {
+/* .gutter {
   width: 8ch;
   margin-right: 3ch;
-}
+} */
 
 .editor {
   flex-grow: 1;
   overflow-x: auto;
+  min-height: 10rem;
 }

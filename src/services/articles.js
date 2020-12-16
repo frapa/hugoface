@@ -73,7 +73,7 @@ export async function getArticle(filename) {
 }
 
 export async function saveArticle(article) {
-  if (article.hasOwnProperty("date")) {
+  if (article.hasOwnProperty("date") && article.date instanceof Date) {
     article.date = article.date.toISOString();
   }
 
@@ -94,4 +94,17 @@ export async function saveArticle(article) {
 
   const byteContent = new TextEncoder("utf-8").encode(content);
   await pfs.writeFile(ARTICLE_DIR + filename, byteContent);
+}
+
+export function newArticle() {
+  return {
+    filename: "draft-" + new Date().toISOString() + ".md",
+    body: "",
+  };
+}
+
+export async function newSavedArticle() {
+  const article = newArticle();
+  await saveArticle(article);
+  return article;
 }

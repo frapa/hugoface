@@ -29,3 +29,11 @@ export async function clone(repo, username, password) {
     throw err;
   }
 }
+
+export async function isDirty() {
+  let status = await git.statusMatrix({
+    fs,
+    dir: DIR,
+  });
+  console.log(status);
+}

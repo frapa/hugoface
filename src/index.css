@@ -1,13 +1,11 @@
 @import "bulma/css/bulma.css";
 
+@import "~fontsource-roboto/400.css";
 @import "~fontsource-source-code-pro/400.css";
 @import "~fontsource-source-code-pro/700.css";
 
 body,
 input {
-  font-family: "Source Code Pro";
-}
-
-.pointer {
-  cursor: pointer;
+  font-family: "Roboto";
+  /* font-family: "Source Code Pro"; */
 }
