@@ -50,6 +50,7 @@
     ]
   },
   "devDependencies": {
+    "@creativebulma/bulma-tooltip": "^1.2.0",
     "firebase-tools": "^8.20.0"
   }
 }

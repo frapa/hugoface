@@ -1,11 +1,9 @@
 @import "bulma/css/bulma.css";
+@import "@creativebulma/bulma-tooltip";
 
 @import "~fontsource-roboto/400.css";
-@import "~fontsource-source-code-pro/400.css";
-@import "~fontsource-source-code-pro/700.css";
 
 body,
 input {
   font-family: "Roboto";
-  /* font-family: "Source Code Pro"; */
 }

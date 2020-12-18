@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import fromMarkdown from "mdast-util-from-markdown";
 
 import "./Editor.css";
 import { getArticle, saveArticle } from "../../services/articles";
+import { AppContext } from "../../services/context";
+import { isDirty } from "../../services/git";
 
 function escapeHtml(unsafe) {
   return unsafe
@@ -123,6 +125,7 @@ function slugify(title) {
 
 export default function Editor() {
   const { filename } = useParams();
+  const { context, setContext } = useContext(AppContext);
 
   const [article, setArticle] = useState([]);
   const [tree, setTree] = useState(null);
@@ -140,6 +143,13 @@ export default function Editor() {
 
     setArticle(article);
     saveArticle(article);
+
+    (async () => {
+      setContext({
+        ...context,
+        dirty: await isDirty(),
+      });
+    })();
   }
 
   function setBody(editorHtml) {
@@ -152,7 +162,13 @@ export default function Editor() {
   }
 
   function setTitle(title) {
-    const slug = slugify(title);
+    // Only change the slug if it wasn't changed by the user
+    let slug = article.slug;
+    const currentTitleSlug = slugify(article.title);
+    if (article.slug === currentTitleSlug) {
+      slug = slugify(title);
+    }
+
     setAndSaveArticle({ ...article, title, slug });
   }
 
@@ -166,7 +182,7 @@ export default function Editor() {
         <input
           className="input title"
           type="text"
-          value={article.title}
+          value={article.title || ""}
           onChange={(event) => setTitle(event.target.value)}
         />
 
@@ -203,7 +219,7 @@ export default function Editor() {
             <label className="label">Slug</label>
           </div>
           <div className="field-body">
-            <div className="field">
+            <div className="field has-addons">
               <div className="control is-expanded has-icons-left">
                 <span className="icon is-small is-left">
                   <i className="fas fa-link"></i>
@@ -215,11 +231,27 @@ export default function Editor() {
                   onChange={(event) =>
                     setAndSaveArticle({
                       ...article,
-                      datsluge: event.target.value,
+                      slug: event.target.value,
                     })
                   }
                 />
               </div>
+              <p className="control">
+                <button
+                  className="button has-tooltip-bottom"
+                  data-tooltip="Reset slug based on title"
+                  onClick={() =>
+                    setAndSaveArticle({
+                      ...article,
+                      slug: slugify(article.title),
+                    })
+                  }
+                >
+                  <span className="icon">
+                    <i className="fas fa-undo"></i>
+                  </span>
+                </button>
+              </p>
             </div>
           </div>
         </div>

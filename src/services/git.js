@@ -30,10 +30,57 @@ export async function clone(repo, username, password) {
   }
 }
 
-export async function isDirty() {
+export async function fileType(path) {
+  // TODO: change this
+  if (path.startsWith("content/post")) {
+    return "article";
+  }
+}
+
+export async function gitStatus() {
   let status = await git.statusMatrix({
     fs,
     dir: DIR,
   });
-  console.log(status);
+
+  const fileStatus = [];
+  for (const [path, head, workDir, stage] of status) {
+    if (head === 1 && (workDir === 1) & (stage === 1)) continue;
+
+    fileStatus.push({
+      path,
+      filename: path.split(/[^\\]\//).pop(),
+      type: await fileType(path),
+      head,
+      workDir,
+      stage,
+      humanReadableState: {
+        [[0, 2]]: "Added",
+        [[1, 2]]: "Modified",
+        [[1, 0]]: "Deleted",
+      }[[head, workDir]],
+    });
+  }
+
+  return fileStatus;
+}
+
+export async function isDirty() {
+  const fileStatus = await gitStatus();
+  return !!fileStatus;
+}
+
+export async function commit(commitMessage) {
+  if (!commitMessage) {
+    console.warn("Not committing because the commit message is empty.");
+  }
+
+  const fileStatus = await gitStatus();
+  await Promise.all(
+    fileStatus.map(async ({ path }) => {
+      await git.add({ fs, dir: DIR, filepath: path });
+    })
+  );
+  await git.commit({ fs, dir: DIR, message: commitMessage });
+  await git.push({ fs, http, dir: DIR });
 }

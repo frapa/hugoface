@@ -1,12 +1,14 @@
 import "./SearchBar.css";
+import PublishButton from "../PublishButton/PublishButton";
+import { AppContext } from "../../services/context";
 
 export default function SearchBar() {
   return (
     <div className="search-bar has-background-white-bis">
       <div className="columns">
-        <div className="column"></div>
+        <div className="column is-narrow"></div>
 
-        <div className="column is-half px-2">
+        <div className="column px-2">
           <p className="control has-icons-left">
             <input
               className="input"
@@ -20,10 +22,8 @@ export default function SearchBar() {
           </p>
         </div>
 
-        <div className="column has-text-right">
-          <button className="button is-primary is-outlined" disabled>
-            Publish
-          </button>
+        <div className="column is-narrow">
+          <PublishButton />
         </div>
       </div>
     </div>
